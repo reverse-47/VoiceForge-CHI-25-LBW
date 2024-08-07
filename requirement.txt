@@ -1,0 +1,17 @@
+sentence-transformers
+spacy
+langchain
+langchain_community
+scikit-learn
+numpy
+six
+emoji
+openai
+pandas
+torch
+grpcio
+protobuf
+grpcio-tools
+anthropic
+flask
+ChatTTS

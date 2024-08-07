@@ -1,0 +1,9 @@
+[
+    {
+        "StoryID": 1001,
+        "Step":1,
+        "Task":"enter the bar counter",
+        "Method":"1. barrier is broken or open.\n2. bar counter is unguarded or accessible.",
+        "SuccessInfo":"Succeed in entering the bar counter, and find bloody graffiti on the wall that says 'Aren't you glad you didn't turn on the light'"
+    }
+]

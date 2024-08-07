@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html  style="height: 100%;">
+
+<head>
+	<!-- Mobile Specific Meta -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Favicon-->
+	<link rel="shortcut icon" href="../static/image/icon.png">
+	<!-- Author Meta -->
+	<meta name="author" content="codepixer">
+	<!-- Meta Description -->
+	<meta name="description" content="AI角色语音合成体验系统">
+	<!-- Meta Keyword -->
+	<meta name="keywords" content="语音合成、AI角色">
+	<!-- meta character set -->
+	<meta charset="UTF-8">
+	<!-- Site Title -->
+	<link href="../static/css/style.css" rel="stylesheet" type="text/css" media="all" />
+	<title>CharacterVox</title>
+
+    <script src="../static/js/api.js"></script>
+    <script src="../static/js/ui.js"></script>
+    <script src="../static/js/data.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/bootstrap.min.css') }}">
+</head>
+
+<body style="height: 100%;">
+	<!-- <ul class="w3lsg-bubbles">
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+	</ul> -->
+	<div class="top">
+		<img class="icon_icon" src="/static/img/icon.png">
+		<strong>CharacterVox</strong>
+	</div>
+	
+	<div class="left1">
+		<button class="add_character" onclick="addCharacter()">
+			<img class="add_icon" src="/static/img/add.png">
+			&nbsp;Create
+		</button>
+	</div>
+	<!-- test character -->
+	<div class="left2" id="characterlist">
+	    <button class="character_box" id="character0" onclick="changePage(0)">
+			Steven&nbsp;
+			<!-- <img class="add_icon" src="/static/image/book.png"></img> -->
+			<img class="add_icon" src="/static/img/delete.png">
+		</button>
+		<button class="character_box" id="character1" onclick="changePage(1)" autofocus>
+			Kiki&nbsp;
+			<img class="add_icon" src="/static/img/delete.png">
+		</button>
+	</div>
+	<!-- test character -->
+	<div class="main_page">
+		<div class="right1">Kiki</div>
+		<div class="right2">
+			<div class="content" id="content0">
+				<div class="timestamp">Start New Chat!</div> 
+			</div>
+		</div>
+		<div class="right2">
+			<div class="content" id="content1">
+				<!-- <div class="timestamp">Start New Chat!</div>  -->
+			</div>
+		</div>
+		<div class="right3">
+			<div class="send_box">
+				<textarea class="input_box" id="input_box"></textarea>
+				<button class="record_btn">
+					<img class="input_icon" src="/static/img/mic.png">
+				</button>
+				<button class="send_btn" onclick="send(document.getElementById('input_box').value)">
+					<img class="input_icon"src="/static/img/up.png">
+				</button>	
+			</div>
+		</div>
+	</div>
+</body>
+</html>
