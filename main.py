@@ -1,49 +1,40 @@
-import time
-import spacy
+import sys
+sys.path.append("./backend/third_party/CosyVoice")
+sys.path.append("./backend/third_party/CosyVoice/third_party/Matcha-TTS")
 from flask import Flask, render_template
 from flask import request
-from sentence_transformers import SentenceTransformer
-from backend.configure import LLM, TALK_LLM, NLP, EBD_MODEL, MODEL_PATH
-from backend.Model.model import GenerationModel
-# from backend.dataloader import load_object, load_skill, load_task
-from backend.llm import GetTextReply
-import ChatTTS
-from IPython.display import Audio
-import torch
-import torchaudio
-# from backend.deal_step import GenerateStep
+from backend.third_party.CosyVoice.cosyvoice.cli.cosyvoice import CosyVoice
+from backend.third_party.CosyVoice.cosyvoice.utils.file_utils import load_wav
+from backend.function.generate_greeting import getGreetingFromText
+from backend.function.generate_reply import getReplyFromText
+import backend.config as cfg
+from openai import OpenAI
 
 app = Flask(__name__)
 
-llm = GenerationModel(LLM)
-# nlp = spacy.load(NLP)
-ebd_model = SentenceTransformer(EBD_MODEL)
-chat = ChatTTS.Chat()
-chat.load()
+llm = OpenAI(api_key=cfg.OPENAI_API_KEY)
+ttsm = CosyVoice(cfg.TTS_MODEL_PATH)
 
 # 首页面
 @app.route("/")
 def index():
 	return render_template('index.html')
 
-@app.route('/getTextReply',methods=['POST'])
-def getTextReply():
+@app.route('/getGreeting',methods=['POST'])
+def getGreeting():
+    data = request.json
+    inputText = data['inputText']
+    data = getGreetingFromText(llm, ttsm, inputText)
+    return data
+
+@app.route('/getReply',methods=['POST'])
+def getReply():
     data = request.json
     inputText = data['inputText']
     personality = data['personality']
     lastConversation = data['lastConversation']
-    data = GetTextReply(llm, inputText, personality, lastConversation)
+    data = getReplyFromText(llm, ttsm, inputText, personality, lastConversation)
     return data
-
-@app.route('/getAudioReply', methods=['POST'])
-def getAudioReply():
-	data = request.json
-	inputText = data['inputText']
-	fileName = data['fileName']
-	texts = [inputText,]
-	wavs = chat.infer(texts, )
-	torchaudio.save(fileName, torch.from_numpy(wavs[0]), 24000)
-	return fileName
 
 if __name__ == '__main__':
 	# 启动多线程参数，加快资源请求，快速响应用户

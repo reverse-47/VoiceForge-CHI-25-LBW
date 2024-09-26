@@ -15,13 +15,13 @@ function getTextReply(inputText, personality, lastConversation) {
     });
 }
 
-function getAudioReply(inputText, fileName) {
+function getGreeting(inputText) {
     return new Promise(function (resolve, reject) {
         $.ajax({
-            url: '/getAudioReply',
+            url: '/getGreeting',
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({inputText:inputText, fileName:fileName}),
+            data: JSON.stringify({inputText:inputText}),
             success: function (data) {
                 resolve(data);
             },

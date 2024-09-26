@@ -86,5 +86,61 @@
 			</div>
 		</div>
 	</div>
+	<div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create Character</h2>
+            <input type="text" id="textInput" placeholder="Input the description of your character's voice here...">
+            <button id="createBtn">Create</button>
+            <div id="result"></div>
+            <audio id="audioPlayer" controls style="display: none;"></audio>
+        </div>
+    </div>
+	<script>
+        const modal = document.getElementById("modal");
+        const closeBtn = document.getElementsByClassName("close")[0];
+        const createBtn = document.getElementById("createBtn");
+        const textInput = document.getElementById("textInput");
+        const result = document.getElementById("result");
+        const audioPlayer = document.getElementById("audioPlayer");
+
+        function addCharacter() {
+            modal.style.display = "block";
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        createBtn.onclick = async function() {
+            const text = textInput.value;
+            if (!text) {
+                alert("Please input text!");
+                return;
+            }
+
+            result.textContent = "Generating...";
+            createBtn.disabled = true;
+			getGreeting(text)
+				.then(function (responseData) {
+					console.log(responseData);
+					const audioUrl = "data:audio/ogg;base64," + responseData['audio'];
+					audioPlayer.src = audioUrl;
+					audioPlayer.style.display = "block";
+                	result.textContent = responseData['text'];
+					createBtn.disabled = false;
+				})
+				.catch(function (error) {
+					createBtn.disabled = false;
+					reject(error); // 发生错误时调用 reject
+				});
+        }
+    </script>
 </body>
 </html>
