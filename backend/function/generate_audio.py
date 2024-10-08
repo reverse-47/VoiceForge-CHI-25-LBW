@@ -15,7 +15,7 @@ def getAudioFromTone(ttsm, tone_ebd, text):
     for i, j in enumerate(ttsm.inference_ebd(text, tensor_cuda, stream=False)):
          # 保存为OGG格式
         ogg_buffer = io.BytesIO()
-        torchaudio.save(ogg_buffer, j['tts_speech'], 22050, format="ogg", encoding="vorbis")
+        torchaudio.save(ogg_buffer, j['tts_speech'], 22050, format="ogg")
         ogg_buffer.seek(0)
         
         # 将OGG字节流编码为base64字符串

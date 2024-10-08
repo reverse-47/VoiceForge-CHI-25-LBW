@@ -88,18 +88,20 @@
 	</div>
 	<div id="modal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <button class="close">X</button>
             <h2>Create Character</h2>
-            <input type="text" id="textInput" placeholder="Input the description of your character's voice here...">
-            <button id="createBtn">Create</button>
-            <div id="result"></div>
-            <audio id="audioPlayer" controls style="display: none;"></audio>
+            <textarea class = "voice_input_box" id="textInput" placeholder="Input the description of your character's voice here..."></textarea>
+            <button class = "create_btn" id="createBtn">Create</button>
+			<button class = "save_btn" id="saveBtn" disabled>Save</button>
+            <div class = "generating" id="result"></div>
+            <audio class = "generating" id="audioPlayer" controls style="display: none;"></audio>
         </div>
     </div>
 	<script>
         const modal = document.getElementById("modal");
         const closeBtn = document.getElementsByClassName("close")[0];
         const createBtn = document.getElementById("createBtn");
+		const saveBtn = document.getElementById("saveBtn");
         const textInput = document.getElementById("textInput");
         const result = document.getElementById("result");
         const audioPlayer = document.getElementById("audioPlayer");
@@ -127,14 +129,18 @@
 
             result.textContent = "Generating...";
             createBtn.disabled = true;
+			saveBtn.disabled = true;
 			getGreeting(text)
 				.then(function (responseData) {
 					console.log(responseData);
 					const audioUrl = "data:audio/ogg;base64," + responseData['audio'];
 					audioPlayer.src = audioUrl;
 					audioPlayer.style.display = "block";
-                	result.textContent = responseData['text'];
+                	//result.textContent = responseData['text'];
+					result.textContent = "";
 					createBtn.disabled = false;
+					saveBtn.disabled = false;
+
 				})
 				.catch(function (error) {
 					createBtn.disabled = false;
