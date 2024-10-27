@@ -1,10 +1,10 @@
-function getTextReply(inputText, personality, lastConversation) {
+function getReply(inputText, personality, lastConversation, toneEbd) {
     return new Promise(function (resolve, reject) {
         $.ajax({
-            url: '/getTextReply',
+            url: '/getReply',
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({inputText:inputText, personality:personality, lastConversation:lastConversation}),
+            data: JSON.stringify({inputText:inputText, personality:personality, lastConversation:lastConversation, toneEbd:toneEbd}),
             success: function (data) {
                 resolve(data);
             },

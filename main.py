@@ -33,7 +33,8 @@ def getReply():
     inputText = data['inputText']
     personality = data['personality']
     lastConversation = data['lastConversation']
-    data = getReplyFromText(llm, ttsm, inputText, personality, lastConversation)
+    toneEbd = data['toneEbd']
+    data = getReplyFromText(llm, ttsm, inputText, personality, lastConversation, toneEbd)
     return data
 
 if __name__ == '__main__':

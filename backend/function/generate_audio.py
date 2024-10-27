@@ -2,9 +2,11 @@ import torchaudio
 import torch
 import io
 import base64
+import numpy as np
 from pydub import AudioSegment
 
-def getAudioFromTone(ttsm, tone_ebd, text):
+def getAudioFromTone(ttsm, toneEbd, text):
+    tone_ebd = np.array(toneEbd)
     if tone_ebd.ndim == 1:
         tone_ebd = tone_ebd.reshape(1, -1)
 
@@ -12,7 +14,7 @@ def getAudioFromTone(ttsm, tone_ebd, text):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     tensor_cuda = tensor.to(device).float()   
     
-    for i, j in enumerate(ttsm.inference_ebd(text, tensor_cuda, stream=False)):
+    for i, j in enumerate(ttsm.inference_ebd(text, tensor_cuda, "", stream=False)):
          # 保存为OGG格式
         ogg_buffer = io.BytesIO()
         torchaudio.save(ogg_buffer, j['tts_speech'], 22050, format="ogg")
