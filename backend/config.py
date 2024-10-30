@@ -3,7 +3,7 @@ OPENAI_API_KEY = "sk-proj-CedLIvmstwE7quvIW4qCjJHzwVyXt7KO_p_YCAmyfvdn98cSFfU7VW
 
 # MODEL NAME
 LLM_MODEL = "gpt-4o"
-TTS_MODEL = 'CosyVoice-300M-Instruct'
+TTS_MODEL = 'CosyVoice-300M-SFT'
 
 # MODEL PATH
 TTS_MODEL_PATH = './backend/third_party/CosyVoice/pretrained_models/'+TTS_MODEL

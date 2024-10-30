@@ -11,7 +11,7 @@ function send(inputText, tone) {
     getReply(inputText, personalityList[currentPage], conversationList, tone)
         .then(function (responseData) {
             console.log(responseData);
-            showResponseMessage(currentPage, responseData["text"], "data:audio/ogg;base64," + responseData['audio'])
+            showResponseMessage(currentPage, responseData["text"], "data:audio/wav;base64," + responseData['audio'])
             conversationList.push({"user": inputText});
             conversationList.push({"assistant": responseData["text"]});
         })

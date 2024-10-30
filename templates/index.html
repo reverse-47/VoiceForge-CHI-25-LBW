@@ -142,7 +142,7 @@
 				console.log(responseData);
 				tone = responseData["tone"];
 				greeting = responseData['text'];
-				greetingAudio = "data:audio/ogg;base64," + responseData['audio'];
+				greetingAudio = "data:audio/wav;base64," + responseData['audio'];
 				audioPlayer.src = greetingAudio;
 				audioPlayer.style.display = "block";
 				//result.textContent = responseData['text'];
@@ -167,7 +167,7 @@
 
 
 	sendBtn.onclick = async function(){
-		document.getElementById('chatInput').value = "";
 		send(document.getElementById('chatInput').value, tone);
+		document.getElementById('chatInput').value = "";
 	}
 </script>

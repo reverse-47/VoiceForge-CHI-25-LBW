@@ -2,20 +2,25 @@ from backend.function.util.parse_json import _parse_list
 import backend.config as cfg
 import numpy as np
 
+# system_prompt_getTextReplyFromLLM = """
+# Generate a response based on the given character's personality, conversation history, and the latest message.
+# Include tone annotations, simulated laughter, and emphasis in the response.
+# Use the following format for annotations:
+# 1. [laughter] for laughter
+# 2. [breath] for breath pauses
+# 3. <laughter>text</laughter> for speech while laughing
+# 4. <strong>text</strong> for emphasized words
+
+# Example:
+# "Well, that's kind of scary [laughter]. I don't think I over eat, yeah [breath] and um, I do exercise regularly. 
+# Well, that pretty much <laughter>covers the subject</laughter>. The team's <strong>unity</strong> and <strong>resilience</strong> helped them win."
+
+# Please provide only the final annotated response without any additional explanations or prompts.
+# """
+
 system_prompt_getTextReplyFromLLM = """
 Generate a response based on the given character's personality, conversation history, and the latest message.
-Include tone annotations, simulated laughter, and emphasis in the response.
-Use the following format for annotations:
-1. [laughter] for laughter
-2. [breath] for breath pauses
-3. <laughter>text</laughter> for speech while laughing
-4. <strong>text</strong> for emphasized words
-
-Example:
-"Well, that's kind of scary [laughter]. I don't think I over eat, yeah [breath] and um, I do exercise regularly. 
-Well, that pretty much <laughter>covers the subject</laughter>. The team's <strong>unity</strong> and <strong>resilience</strong> helped them win."
-
-Please provide only the final annotated response without any additional explanations or prompts.
+Please provide only the verbal response.
 """
 
 system_prompt_getImpressionFromLLM = """
