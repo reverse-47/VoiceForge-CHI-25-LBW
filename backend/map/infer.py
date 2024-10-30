@@ -100,11 +100,11 @@ def get_most_similar_embedding(query_impression):
     normalized_impression = custom_normalize_impression(query_impression)
     
     # 3. 应用权重（只取前8个维度）
-    weights = weights_data['weights'][:2]  # 只取前8个维度的权重
-    weighted_impression = torch.FloatTensor(normalized_impression[:2] * weights.numpy())  # 只用前8个维度
+    weights = weights_data['weights'][:8]  # 只取前8个维度的权重
+    weighted_impression = torch.FloatTensor(normalized_impression[:8] * weights.numpy())  # 只用前8个维度
     
     # 4. 找到最相似的weighted_impression对应的embedding
-    all_weighted_impressions = weighted_data['weighted_impressions'][:, :2]  # 只用前8个维度
+    all_weighted_impressions = weighted_data['weighted_impressions'][:, :8]  # 只用前8个维度
     all_embeddings = weighted_data['embeddings']
     
     # 计算余弦相似度
