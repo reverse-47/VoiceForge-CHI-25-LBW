@@ -30,30 +30,19 @@
 		<strong>CharacterVox - Research Demo for CHI</strong>
 	</div>
 	<div class="left-top">
-		<button class="create-btn" onclick="addCharacter()">
+		<button class="create-btn" id="addBtn">
 			<img class="create-icon" src="/static/img/add.png">
 			&nbsp;Create
 		</button>
 	</div>
 	<!-- test character -->
 	<div class="left-bottom" id="characterlist">
-	    <button class="character-box-selected" id="character0" onclick="changePage(0)">
-			Test&nbsp;
-			<!-- <img class="add_icon" src="/static/image/book.png"></img> -->
-			<img class="delete-icon" src="/static/img/delete.png">
-		</button>
-		<!--<button class="character-box" id="character1" onclick="changePage(1)" autofocus>
-			Kiki&nbsp;
-			<img class="delete-icon" src="/static/img/delete.png">
-		</button>-->
+	    
 	</div>
 
 	<div class="main-page">
-		<div class="right-top">Test</div>
-		<div class="right-middle">
-			<div class="content" id="content0">
-				<!-- <div class="timestamp">Start New Chat!</div>  -->
-			</div>
+		<div class="right-top" id="name">Test</div>
+		<div class="right-middle" id = "contentList">
 		</div>
 		<div class="right-bottom">
 			<div class="send-box">
@@ -130,10 +119,12 @@
 
 <script>
 	let tone = [];
+	let tmpTone = [];
 	let greeting = "Hi, nice to meet you!";
 	let greetingAudio = "";
 	const headerBtn = document.getElementById("headerBtn");
 	const modal = document.getElementById("modal");
+	const addBtn = document.getElementById("addBtn");
 	const createBtn = document.getElementById("createBtn");
 	const saveBtn = document.getElementById("saveBtn");
 	const sendBtn = document.getElementById("sendBtn");
@@ -174,7 +165,8 @@
 		if (modal && modal.style.display !== 'none') {
 			if (!modalContent.contains(event.target) && 
 				!tabContainer.contains(event.target)&&
-				!event.target.matches('.header-btn')) {
+				!event.target.matches('.header-btn')&&
+				!event.target.matches('.create-btn')) {
 				modal.style.display = 'none';
 			}
 		}
@@ -331,7 +323,7 @@
 		getMix(timbreList)
 			.then(function (responseData) {
 				console.log(responseData);
-				tone = responseData["tone"];
+				tmpTone = responseData["tone"];
 				greeting = responseData['text'];
 				greetingAudio = "data:audio/wav;base64," + responseData['audio'];
 				audioPlayer2.src = greetingAudio;
@@ -355,11 +347,13 @@
 		modal.style.display = "none";
 	};
 
-	function addCharacter() {
+
+	headerBtn.onclick = function() {
 		modal.style.display = "block";
 	}
 
-	headerBtn.onclick = function() {
+	addBtn.onclick = function() {
+		console.log("test");
 		modal.style.display = "block";
 	}
 
@@ -383,7 +377,7 @@
 		getGreeting(text)
 			.then(function (responseData) {
 				console.log(responseData);
-				tone = responseData["tone"];
+				tmpTone = responseData["tone"];
 				greeting = responseData['text'];
 				greetingAudio = "data:audio/wav;base64," + responseData['audio'];
 				audioPlayer.src = greetingAudio;
@@ -403,12 +397,14 @@
 	saveBtn.onclick = async function(){
 		modal.style.display = "none";
 		document.getElementById("startPage").style.display = "none";
-		init(textInput.value, greeting);
-		showResponseMessage(0, greeting, greetingAudio);
+		//init(textInput.value, greeting);
+		addCharacter(textInput.value);
+		tone.push(tmpTone);
+		showResponseMessage(currentPage, greeting, greetingAudio);
 	}
 
 	sendBtn.onclick = async function(){
-		send(document.getElementById('chatInput').value, tone);
+		send(document.getElementById('chatInput').value, tone[currentPage]);
 		document.getElementById('chatInput').value = "";
 	}
 </script>
