@@ -7,7 +7,7 @@ conversationList = [];
 function send(inputText, tone) {
     conversationLength[currentPage]++;
     var length = conversationLength[currentPage];
-    showInputMessage(currentPage, inputText, length);
+    //showInputMessage(currentPage, inputText, length);
     getReply(inputText, personalityList[currentPage], conversationList, tone)
         .then(function (responseData) {
             console.log(responseData);

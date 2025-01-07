@@ -3,21 +3,23 @@ from backend.function.generate_audio import getAudioFromTone
 
 def getReplyFromText(llm, ttsm, input_text, personality, last_conversation, tone_ebd):
     data = {}
-    conversation = convertConversationToPrompt(last_conversation)
-    prompt = f"""
-    Character's personality:
-    {personality}
+    # conversation = convertConversationToPrompt(last_conversation)
+    # prompt = f"""
+    # Character's personality:
+    # {personality}
 
-    Conversation history:
-    {conversation}
+    # Conversation history:
+    # {conversation}
 
-    Latest message:
-    {input_text}
+    # Latest message:
+    # {input_text}
 
-    Generate an annotated response for this character:
-    """
-    data["text"] = getTextReplyFromLLM(llm, prompt)
-    print(data["text"])
+    # Generate an annotated response for this character:
+    # """
+    # data["text"] = getTextReplyFromLLM(llm, prompt)
+    data["text"] = input_text
+    # print(data["text"])
+    
     data["audio"] = getAudioFromTone(ttsm, tone_ebd, data["text"])
     
     return data

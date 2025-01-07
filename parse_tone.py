@@ -14,7 +14,7 @@ import json
 APP_ID = '115921972'
 API_KEY = 'cX8At8LZ6buRFmBLTYRZG4Q8'
 SECRET_KEY = 'FdvBiaNkkKaUU3sgc309oInofP7vsnQl'
-GREETING = "Good morning, I hope this day finds you well. It's a pleasure to see you today!"
+GREETING = "Good morning, it's a pleasure to see you!"
 
 client = AipSpeech(APP_ID, API_KEY, SECRET_KEY)
 
@@ -77,7 +77,7 @@ def getEbdFromFile(ttsm, file_name):
     result = recognize_speech(cfg.WAV_INPUT_PATH+file_name)
     print(result+'\n')
     for i, j in enumerate(ttsm.inference_zero_shot(GREETING, result, prompt_speech_16k, stream=False)):
-        torchaudio.save("./wav"+file_name.format(i), j['tts_speech'], 22050)
+        torchaudio.save("./wav/"+file_name.format(i), j['tts_speech'], 22050)
     # embedding = ttsm.get_spk_embedding(prompt_speech_16k)
         
     # 准备新数据

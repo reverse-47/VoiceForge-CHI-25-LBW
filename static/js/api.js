@@ -31,3 +31,20 @@ function getGreeting(inputText) {
         });
     });
 }
+
+function getMix(timbreList) {
+    return new Promise(function (resolve, reject) {
+        $.ajax({
+            url: '/getMix',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({timbreList: timbreList}),
+            success: function (data) {
+                resolve(data);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                reject(errorThrown);
+            }
+        });
+    });
+}

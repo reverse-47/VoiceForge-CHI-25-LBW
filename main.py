@@ -5,7 +5,7 @@ from flask import Flask, render_template
 from flask import request
 from backend.third_party.CosyVoice.cosyvoice.cli.cosyvoice import CosyVoice
 from backend.third_party.CosyVoice.cosyvoice.utils.file_utils import load_wav
-from backend.function.generate_greeting import getGreetingFromText
+from backend.function.generate_greeting import getGreetingFromText, getGreetingFromMixedTimbre
 from backend.function.generate_reply import getReplyFromText
 import backend.config as cfg
 from openai import OpenAI
@@ -26,6 +26,14 @@ def getGreeting():
     inputText = data['inputText']
     data = getGreetingFromText(llm, ttsm, inputText)
     return data
+
+@app.route('/getMix',methods=['POST'])
+def getMix():
+    data = request.json
+    timbreList = data['timbreList']
+    data = getGreetingFromMixedTimbre(ttsm, timbreList)
+    return data
+
 
 @app.route('/getReply',methods=['POST'])
 def getReply():

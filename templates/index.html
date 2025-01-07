@@ -5,7 +5,7 @@
 	<!-- Mobile Specific Meta -->
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<!-- Favicon-->
-	<link rel="shortcut icon" href="../static/image/icon.png">
+	<link rel="shortcut icon" href="../static/img/icon.png">
 	<!-- Author Meta -->
 	<meta name="author" content="codepixer">
 	<!-- Meta Description -->
@@ -77,20 +77,54 @@
 		<button class="header-btn" id="headerBtn">Create a new character</button>
 	</div>
 	<div id="modal" class="modal">
-        <div class="modal-content">
-			<div class = "modal-title">
-				<button class="close-btn" id = "closeBtn"><strong>X</strong></button>
-            	<h2><strong>Create Character<strong></h2>
+		<!-- Tab 按钮移到这里 -->
+		<div class="tab-container" id = "tabContainer">
+			<button class="tab-text-btn active" data-tab="create">
+				<img src="../static/img/tab1.png" alt="tab1 icon" class="tab-icon">
+			</button>
+			<button class="tab-weight-btn" data-tab="settings" src="../static/image/speek.png">
+				<img src="../static/img/tab2.png" alt="tab2 icon" class="tab-icon">
+			</button>
+			<div class="modal-title">
+				<strong>CREATE CHARACTER</strong>
 			</div>
-            <textarea class = "voice-input" id="textInput" placeholder="Input the description of your character's voice here..."></textarea>
-            <div class = "modal-bottom">
-				<button class = "generate-btn" id="createBtn">Create</button>
-				<button class = "save-btn" id="saveBtn" disabled>Save</button>
-				<div class = "generating" id="result"></div>
-				<audio class = "generating" id="audioPlayer" controls style="display: none;"></audio>
+
+		</div>
+		
+		<div class="modal-content" id = "modalContent">
+			
+			<!-- Tab 内容区域 -->
+			<div class="tab-content active" id="createTab">
+				<textarea class="voice-input" id="textInput" placeholder="Input the description of your character's voice here..."></textarea>
+				<div class="modal-bottom">
+					<button class="generate-btn" id="createBtn">Create</button>
+					<button class="save-btn" id="saveBtn" disabled>Save</button>
+					<div class="generating" id="result"></div>
+					<audio class="generating" id="audioPlayer" controls style="display: none;"></audio>
+				</div>
 			</div>
-        </div>
-    </div>
+			
+			<div class="tab-content" id="settingsTab">
+				<div class="audio-mixer">
+					<div class="audio-list" id="audioList">
+						<!-- 音频文件将在这里动态添加 -->
+					</div>
+					
+					<div class="upload-container" id="uploadContainer">
+						<input type="file" id="audioFileInput" accept="audio/*" style="display: none;">
+						<button class="upload-btn" onclick="document.getElementById('audioFileInput').click()">+</button>
+					</div>
+				</div>
+				<div class="modal-bottom">
+					<button class="generate-btn" id="mixBtn">Create</button>
+					<button class="save-btn" id="saveMixBtn" disabled>Save</button>
+					<div class="generating" id="mixResult"></div>
+					<div class="generating" id="result2"></div>
+					<audio class="generating" id="audioPlayer2" controls style="display: none;"></audio>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
 
@@ -100,13 +134,226 @@
 	let greetingAudio = "";
 	const headerBtn = document.getElementById("headerBtn");
 	const modal = document.getElementById("modal");
-	const closeBtn = document.getElementById("closeBtn");
 	const createBtn = document.getElementById("createBtn");
 	const saveBtn = document.getElementById("saveBtn");
 	const sendBtn = document.getElementById("sendBtn");
 	const textInput = document.getElementById("textInput");
 	const result = document.getElementById("result");
+	const result2 = document.getElementById("result2");
 	const audioPlayer = document.getElementById("audioPlayer");
+	const audioPlayer2 = document.getElementById("audioPlayer2");
+
+	document.addEventListener('DOMContentLoaded', function() {
+		// 选择所有带有data-tab属性的按钮
+		const tabs = document.querySelectorAll('button[data-tab]');
+		
+		tabs.forEach(tab => {
+			tab.addEventListener('click', function() {
+				// 移除所有tab按钮的active类
+				tabs.forEach(t => t.classList.remove('active'));
+				
+				// 给当前点击的tab添加active类
+				this.classList.add('active');
+				
+				// 获取对应的内容区域
+				const tabId = this.getAttribute('data-tab');
+				const contents = document.querySelectorAll('.tab-content');
+				
+				// 隐藏所有内容
+				contents.forEach(content => content.classList.remove('active'));
+				
+				// 显示当前tab对应的内容
+				document.getElementById(tabId + 'Tab').classList.add('active');
+			});
+		});
+	});
+
+	window.addEventListener('click', function(event) {
+		const modalContent = document.getElementById('modalContent');
+		const tabContainer = document.getElementById('tabContainer');
+		if (modal && modal.style.display !== 'none') {
+			if (!modalContent.contains(event.target) && 
+				!tabContainer.contains(event.target)&&
+				!event.target.matches('.header-btn')) {
+				modal.style.display = 'none';
+			}
+		}
+	});
+
+	// 音频混合相关变量
+	let audioFiles = [];
+	let weights = [];
+	const maxAudioFiles = 3;
+
+	// 初始化文件输入监听
+	document.getElementById('audioFileInput').addEventListener('change', handleFileUpload);
+
+	function handleFileUpload(e) {
+		const file = e.target.files[0];
+		if (file && audioFiles.length < maxAudioFiles) {
+			// 创建 FileReader 来读取文件内容
+			const reader = new FileReader();
+			reader.onload = function(e) {
+				// 获取 base64 格式的音频数据（去掉 data:audio/wav;base64, 前缀）
+				const base64Audio = e.target.result.split(',')[1];
+				
+				// 创建音频 URL 用于播放
+				const url = URL.createObjectURL(file);
+				
+				// 保存文件信息
+				audioFiles.push({
+					name: file.name,
+					url: url,
+					base64: base64Audio
+				});
+				
+				// 调整权重
+				const remainingWeight = 1 - weights.reduce((a, b) => a + b, 0);
+				weights.push(remainingWeight);
+				
+				updateAudioList();
+			};
+			reader.readAsDataURL(file);
+		}
+	}
+
+	function updateAudioList() {
+		const audioList = document.getElementById('audioList');
+		audioList.innerHTML = '';
+		
+		audioFiles.forEach((file, index) => {
+			const audioItem = document.createElement('div');
+			audioItem.className = 'audio-item';
+			
+			// 创建音频播放器区域
+			const playerContainer = document.createElement('div');
+			playerContainer.className = 'player-container';
+			
+			// 创建音频标签
+			const audio = document.createElement('audio');
+			audio.src = file.url;
+			audio.controls = true;
+			audio.className = 'audio-player';
+			
+			// 权重控制
+			const weightControl = document.createElement('div');
+			weightControl.className = 'weight-control';
+			
+			const slider = document.createElement('input');
+			slider.type = 'range';
+			slider.min = '0';
+			slider.max = '1';
+			slider.step = '0.01';
+			slider.value = weights[index];
+			slider.className = 'weight-slider';
+			slider.oninput = (e) => handleWeightChange(index, parseFloat(e.target.value));
+			
+			const value = document.createElement('span');
+			value.className = 'weight-value';
+			value.textContent = (weights[index] || 0).toFixed(2);
+			
+			weightControl.appendChild(slider);
+			weightControl.appendChild(value);
+			
+			playerContainer.appendChild(audio);
+			audioItem.appendChild(playerContainer);
+			audioItem.appendChild(weightControl);
+			audioList.appendChild(audioItem);
+		});
+		
+		// 控制上传按钮的显示
+		document.getElementById('uploadContainer').style.display = 
+			audioFiles.length >= maxAudioFiles ? 'none' : 'block';
+		
+		// 控制 Create 按钮的状态
+		document.getElementById('mixBtn').disabled = audioFiles.length === 0;
+	}
+	
+	function handleWeightChange(index, value) {
+		// 确保value在0到1之间
+		value = Math.max(0, Math.min(1, value));
+		
+		if (weights.length > 1) {
+			// 保存旧值用于比较
+			const oldValue = weights[index];
+			
+			// 计算其他权重的总和
+			const othersTotal = 1 - value;
+			
+			// 如果其他权重总和接近0，给予平均值
+			if (Math.abs(othersTotal) < 0.0001) {
+				const otherCount = weights.length - 1;
+				const equalShare = othersTotal / otherCount;
+				weights = weights.map((w, i) => i === index ? value : equalShare);
+			} else {
+				// 计算其他权重的缩放比例
+				const oldOthersTotal = 1 - oldValue;
+				const scale = othersTotal / (Math.abs(oldOthersTotal) < 0.0001 ? 1 : oldOthersTotal);
+				
+				// 更新所有权重
+				weights = weights.map((w, i) => {
+					if (i === index) return value;
+					const newWeight = w * scale;
+					return Math.max(0, Math.min(1, newWeight)); // 确保在0-1范围内
+				});
+			}
+			
+			// 确保所有权重总和为1
+			const sum = weights.reduce((a, b) => a + b, 0);
+			if (Math.abs(sum - 1) > 0.0001) {
+				const scale = 1 / sum;
+				weights = weights.map(w => w * scale);
+			}
+		} else {
+			weights[index] = value;
+		}
+		
+		updateAudioList();
+	}
+
+	// 混音按钮事件
+	document.getElementById('mixBtn').onclick = function() {
+		// 这里添加混音处理逻辑
+		if (audioFiles.length === 0) {
+			alert("Please upload at least one audio file!");
+			return;
+		}
+	
+		// 准备发送给后端的数据
+		const timbreList = audioFiles.map((file, index) => ({
+			speech: file.base64,
+			weight: weights[index]
+		}));
+		result2.textContent = "Generating...";
+		audioPlayer2.style.display = "none";
+		document.getElementById('saveMixBtn').disabled = true;
+		document.getElementById('mixBtn').disabled = true;
+		getMix(timbreList)
+			.then(function (responseData) {
+				console.log(responseData);
+				tone = responseData["tone"];
+				greeting = responseData['text'];
+				greetingAudio = "data:audio/wav;base64," + responseData['audio'];
+				audioPlayer2.src = greetingAudio;
+				audioPlayer2.style.display = "block";
+				//result.textContent = responseData['text'];
+				result2.textContent = "";
+				document.getElementById('saveMixBtn').disabled = false;
+				document.getElementById('mixBtn').disabled = false;
+
+			})
+			.catch(function (error) {
+				document.getElementById('mixBtn').disabled = false;
+				document.getElementById('saveMixBtn').disabled = false;
+				reject(error); // 发生错误时调用 reject
+			});
+	};
+
+	// 保存按钮事件
+	document.getElementById('saveMixBtn').onclick = function() {
+		// 这里添加保存处理逻辑
+		modal.style.display = "none";
+	};
 
 	function addCharacter() {
 		modal.style.display = "block";
@@ -114,10 +361,6 @@
 
 	headerBtn.onclick = function() {
 		modal.style.display = "block";
-	}
-
-	closeBtn.onclick = function() {
-		modal.style.display = "none";
 	}
 
 	window.onclick = function(event) {
@@ -163,8 +406,6 @@
 		init(textInput.value, greeting);
 		showResponseMessage(0, greeting, greetingAudio);
 	}
-
-
 
 	sendBtn.onclick = async function(){
 		send(document.getElementById('chatInput').value, tone);
