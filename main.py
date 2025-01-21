@@ -7,6 +7,7 @@ from backend.third_party.CosyVoice.cosyvoice.cli.cosyvoice import CosyVoice
 from backend.third_party.CosyVoice.cosyvoice.utils.file_utils import load_wav
 from backend.function.generate_greeting import getGreetingFromText, getGreetingFromMixedTimbre
 from backend.function.generate_reply import getReplyFromText
+from backend.function.generate_narrative import getNarrativeAudioFromText
 import backend.config as cfg
 from openai import OpenAI
 
@@ -43,6 +44,14 @@ def getReply():
     lastConversation = data['lastConversation']
     toneEbd = data['toneEbd']
     data = getReplyFromText(llm, ttsm, inputText, personality, lastConversation, toneEbd)
+    return data
+
+@app.route('/getNarrativeAudio',methods=['POST'])
+def getNarrativeAudio():
+    data = request.json
+    inputText = data['inputText']
+    toneList = data['toneList']
+    data = getNarrativeAudioFromText(llm, ttsm, inputText, toneList)
     return data
 
 if __name__ == '__main__':

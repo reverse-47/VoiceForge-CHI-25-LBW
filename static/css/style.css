@@ -98,31 +98,42 @@ body, html {
     border-right: 1px solid #494949;
 }
 
-.left-bottom {
+.left-middle {
     position:absolute;
     width: 25%;
-    height:75%;
+    height:53%;
     top: 25%;
     left: 0%;
     background-color: #181818;
     border-right: 1px solid #494949;
+    border-bottom: 1px solid #494949;
     overflow-y: scroll;
 }
-.left-bottom::-webkit-scrollbar {
+.left-middle::-webkit-scrollbar {
         width: 4px;    
         /*height: 4px;*/
     }
-    .left-bottpm::-webkit-scrollbar-thumb {
+    .left-middle::-webkit-scrollbar-thumb {
         border-radius: 10px;
         -webkit-box-shadow: inset 0 0 5px rgba(93,92,222,0.5);
         background: rgba(255,255,255,0);
     }
-    .left-bottom::-webkit-scrollbar-track {
+    .left-middle::-webkit-scrollbar-track {
         -webkit-box-shadow: inset 0 0 5px rgba(255,255,255,0);
         border-radius: 0;
         background: rgba(255,255,255,0);
 
     }
+
+.left-bottom{
+    position:absolute;
+    width: 25%;
+    height:22%;
+    top: 78%;
+    left: 0%;
+    background-color: #181818;
+    border-right: 1px solid #494949;
+}
 
 .right-top{
     position:absolute;
@@ -196,6 +207,66 @@ body, html {
     padding:10px;
     resize: none;
 }
+.narrative-input{
+    position: absolute;
+    width:90%;
+    height:72%;
+    left:5%;
+    top:10%;
+    border-radius: 15px;
+    background-color: #1c1c1c;
+    color: #f8f8f8;
+    font-family: "ANJA";
+    border:#494949 2px solid;
+    outline:none;
+    padding:10px;
+    resize: none;
+}
+.narrative-generate-btn{
+    position: absolute;
+    width:15%;
+    height:8%;
+    left:5%;
+    bottom:5%;
+    border-radius: 15px;
+    background-color: rgb(60, 60, 130);
+    color: #f8f8f8;
+    font-family: "ANJA";
+    border:none;
+    outline:none;
+    padding:10px;
+    resize: none;
+}
+.narrative-audio{
+    position: absolute;
+    left:5%;
+    top:10%;
+    width:90%;
+    height:50%;
+}
+.narrative-clear-btn{
+    position: absolute;
+    width:15%;
+    height:8%;
+    left:21%;
+    bottom:5%;
+    border-radius: 15px;
+    background-color: rgb(102, 102, 102);
+    color: #f8f8f8;
+    font-family: "ANJA";
+    border:none;
+    outline:none;
+    padding:10px;
+    resize: none;
+}
+.narrative-generating{
+    position: absolute;
+    left:5%;
+    top:30%;
+    width:90%;
+    height:50%;
+    color: #f8f8f8;
+}
 .send-btn{
     position: absolute;
     width:40px;
@@ -239,6 +310,25 @@ body, html {
     background-color: rgba(72, 72, 177);
 }
 .create-btn:focus{
+    outline:0;
+}
+
+.mode-btn{
+    width:80%;
+    height:40%;
+    margin-left: 10%;
+    margin-top: 12%;
+    background-color: #cecece;
+    color: #333333;
+    border:none;
+    font-family:'MO';
+    font-size:25px;
+    border-radius: 20px;
+}
+.mode-btn:hover{
+    background-color: rgb(110, 110, 110);
+}
+.mode-btn:focus{
     outline:0;
 }
 

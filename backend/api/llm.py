@@ -46,6 +46,25 @@ system_prompt_getGreetingTextFromLLM = """
 Based on the user's description of a character's personality, generate an appropriate greeting phrase. 
 """
 
+system_prompt_getMarkedTextFromLLM = """
+You are a text analyzer that splits narrative passages into sequential segments. 
+
+Rules:
+1. Split text into sequential segments
+2. Assign character names ONLY for their direct speech/dialogue
+3. All actions, descriptions, and narratives (including character actions) go to "narrator"
+4. Each segment must be a complete sentence or phrase
+5. Return as list of {speaker, text} pairs in strict sequence
+
+Output format:
+[
+    {"speaker": "narrator/character", "text": "segment content"},
+    ...
+]
+
+Note: Always use "narrator" for everything except direct speech, even if the text describes a character's actions.
+"""
+
 def getTextReplyFromLLM(llm, prompt):
     try:
         completion = llm.chat.completions.create(
@@ -86,3 +105,55 @@ def getGreetingTextFromLLM(llm, prompt):
         return completion.choices[0].message.content.strip()
     except Exception as e:
         return f"An error occurred: {str(e)}"
+    
+def getMarkedTextFromLLM(llm, input_text, toneList):
+    characters = list(toneList.keys())
+    prompt = f"""
+    Characters: {characters}
+    Passage:
+    {input_text}
+    """
+    try:
+        completion = llm.chat.completions.create(
+            model = cfg.LLM_MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt_getMarkedTextFromLLM}, # <-- This is the system message that provides context to the model
+                {"role": "user", "content": prompt}  # <-- This is the user message for which the model will generate a response
+            ]
+        )
+        return parse_llm_string(completion.choices[0].message.content.strip(), toneList)
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+    
+def parse_llm_string(llm_output: str, characters_dict: dict) -> list:
+    import re
+    import json
+    
+    # Add narrator to valid characters
+    valid_characters = set(characters_dict.keys()) | {"narrator"}
+    
+    # Find the first occurrence of a list of dictionaries
+    # Looking for pattern like [{...}, {...}, ...]
+    pattern = r'\[\s*{[^]]*}\s*\]'
+    match = re.search(pattern, llm_output)
+    
+    if not match:
+        return []
+        
+    try:
+        # Parse the matched string to list of dicts
+        segments = json.loads(match.group())
+        
+        # Filter valid segments
+        valid_segments = [
+            segment for segment in segments
+            if isinstance(segment, dict)
+            and "speaker" in segment
+            and "text" in segment
+            and segment["speaker"] in valid_characters
+        ]
+        
+        return valid_segments
+        
+    except json.JSONDecodeError:
+        return []

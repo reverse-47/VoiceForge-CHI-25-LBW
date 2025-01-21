@@ -36,16 +36,26 @@
 		</button>
 	</div>
 	<!-- test character -->
-	<div class="left-bottom" id="characterlist">
+	<div class="left-middle" id="characterlist">
 	    
+	</div>
+
+	<div class="left-bottom">
+	    <button class="mode-btn" id="narrativeModeBtn">Narrative Mode</button>
+		<button class="mode-btn" id="characterModeBtn" style="display:none;">Character Mode</button>
 	</div>
 
 	<div class="main-page">
 		<div class="right-top" id="name">Test</div>
 		<div class="right-middle" id = "contentList">
 		</div>
+		<div class = "right-middle" id = "narrative" style="display:none;">
+			<textarea class="narrative-input" id="narrativeInput"></textarea>
+			<button class="narrative-generate-btn" id="narrativeGenerateBtn"> Generate </button>
+			<button class="narrative-clear-btn" id = "narrativeClearBtn"> Clear </button>
+		</div>
 		<div class="right-bottom">
-			<div class="send-box">
+			<div class="send-box" id ="sendBox">
 				<textarea class="chat-input" id="chatInput"></textarea>
 				<button class="record-btn">
 					<img class="icon" src="/static/img/mic.png">
@@ -53,6 +63,10 @@
 				<button class="send-btn" id = "sendBtn">
 					<img class="icon"src="/static/img/up.png">
 				</button>	
+			</div>
+			<div id="narrativeAudio">
+				<audio class="narrative-audio" controls id="narrativeAudioPlayer" style = "display:none;"></audio>
+				<div class="narrative-generating" id="narrativeGenerating" style = "display:none;">Generating...</div>
 			</div>
 		</div>
 	</div>
@@ -118,8 +132,8 @@
 </html>
 
 <script>
-	let tone = [];
-	let tmpTone = [];
+	let tmpToneFromText = [];
+	let tmpToneFromMix = [];
 	let greeting = "Hi, nice to meet you!";
 	let greetingAudio = "";
 	const headerBtn = document.getElementById("headerBtn");
@@ -133,6 +147,18 @@
 	const result2 = document.getElementById("result2");
 	const audioPlayer = document.getElementById("audioPlayer");
 	const audioPlayer2 = document.getElementById("audioPlayer2");
+
+	const narrativeModeBtn = document.getElementById("narrativeModeBtn");
+	const characterModeBtn = document.getElementById("characterModeBtn");
+
+	const narrativeAudioPlayer = document.getElementById("narrativeAudioPlayer");
+	const narrativeGenerateBtn = document.getElementById("narrativeGenerateBtn");
+	const narrativeClearBtn = document.getElementById("narrativeClearBtn");
+
+	// 音频混合相关变量
+	let audioFiles = [];
+	let weights = [];
+	const maxAudioFiles = 3;
 
 	document.addEventListener('DOMContentLoaded', function() {
 		// 选择所有带有data-tab属性的按钮
@@ -168,14 +194,14 @@
 				!event.target.matches('.header-btn')&&
 				!event.target.matches('.create-btn')) {
 				modal.style.display = 'none';
+				const audioList = document.getElementById('audioList');
+				audioList.innerHTML = '';
+				audioFiles = [];
+				weights = [];
 			}
 		}
 	});
 
-	// 音频混合相关变量
-	let audioFiles = [];
-	let weights = [];
-	const maxAudioFiles = 3;
 
 	// 初始化文件输入监听
 	document.getElementById('audioFileInput').addEventListener('change', handleFileUpload);
@@ -323,7 +349,7 @@
 		getMix(timbreList)
 			.then(function (responseData) {
 				console.log(responseData);
-				tmpTone = responseData["tone"];
+				tmpToneFromMix = responseData["tone"];
 				greeting = responseData['text'];
 				greetingAudio = "data:audio/wav;base64," + responseData['audio'];
 				audioPlayer2.src = greetingAudio;
@@ -345,6 +371,14 @@
 	document.getElementById('saveMixBtn').onclick = function() {
 		// 这里添加保存处理逻辑
 		modal.style.display = "none";
+		const audioList = document.getElementById('audioList');
+		audioList.innerHTML = '';
+		audioFiles = [];
+		weights = [];
+		document.getElementById("startPage").style.display = "none";
+		//init(textInput.value, greeting);
+		addCharacter(textInput.value, tmpToneFromMix);
+		showResponseMessage(currentPage, greeting, greetingAudio);
 	};
 
 
@@ -377,7 +411,7 @@
 		getGreeting(text)
 			.then(function (responseData) {
 				console.log(responseData);
-				tmpTone = responseData["tone"];
+				tmpToneFromText = responseData["tone"];
 				greeting = responseData['text'];
 				greetingAudio = "data:audio/wav;base64," + responseData['audio'];
 				audioPlayer.src = greetingAudio;
@@ -398,13 +432,74 @@
 		modal.style.display = "none";
 		document.getElementById("startPage").style.display = "none";
 		//init(textInput.value, greeting);
-		addCharacter(textInput.value);
-		tone.push(tmpTone);
+		addCharacter(textInput.value, tmpToneFromText);
 		showResponseMessage(currentPage, greeting, greetingAudio);
 	}
 
 	sendBtn.onclick = async function(){
-		send(document.getElementById('chatInput').value, tone[currentPage]);
+		send(document.getElementById('chatInput').value, nameList[currentPage]);
 		document.getElementById('chatInput').value = "";
+	}
+
+	narrativeModeBtn.onclick = function() {
+		characterModeBtn.style.display = "block";
+		narrativeModeBtn.style.display = "none";
+		document.getElementById("contentList").style.display = "none";
+		document.getElementById("narrative").style.display = "block";
+		document.getElementById("name").textContent = "Narrative Mode";
+		document.getElementById("sendBox").style.display = "none";
+		document.getElementById("narrativeAudio").style.display = "block";
+		// 获取所有的 character-box
+		var characterBoxes = document.querySelectorAll("#characterlist .character-box");
+
+		// 遍历所有的 character-box，移除 'character-box-selected' 样式
+		characterBoxes.forEach(function(box) {
+			box.classList.remove("character-box-selected");
+			box.style.pointerEvents = 'none';
+		});
+	}
+
+	characterModeBtn.onclick = function() {
+		characterModeBtn.style.display = "none";
+		narrativeModeBtn.style.display = "block";
+		document.getElementById("contentList").style.display = "block";
+		document.getElementById("narrative").style.display = "none";
+		document.getElementById("sendBox").style.display = "block";
+		document.getElementById("narrativeAudio").style.display = "none";
+		changePage(currentPage);
+	}
+
+	narrativeGenerateBtn.onclick = function() {
+		narrativeGenerateBtn.disabled = true;
+		narrativeAudioPlayer.style.display = "none";
+		document.getElementById("narrativeGenerating").style.display = "block";
+		narrative_input = document.getElementById("narrativeInput").value;
+		let ToneList = {};
+		nameList.forEach(function(name, idx){
+			if(name!=""){
+				ToneList[name] = toneList[idx];
+			}
+		});
+		getNarrativeAudio(narrative_input, ToneList)
+        .then(function (responseData) {
+            console.log(responseData);
+            // 隐藏加载状态并显示播放按钮
+            narrativeAudioPlayer.src = "data:audio/wav;base64,"+responseData;
+			narrativeAudioPlayer.load(); // 确保新的src被加载
+			document.getElementById("narrativeGenerating").style.display = "none";
+			narrativeAudioPlayer.style.display = "block";
+			narrativeGenerateBtn.disabled = false;
+			narrativeAudioPlayer.play().catch(function (error) {
+				console.log("播放失败: ", error);
+			});
+        })
+        .catch(function (error) {
+            console.error("Error:", error);
+			narrativeGenerateBtn.disabled = false;
+        });
+	}
+
+	narrativeClearBtn.onclick = function(){
+		document.getElementById("narrativeInput").value = "";
 	}
 </script>

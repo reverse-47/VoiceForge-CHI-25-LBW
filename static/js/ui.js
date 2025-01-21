@@ -29,7 +29,7 @@ function changePage(index) {
     contentList.forEach(function(content, idx) {
         if (content.id === "content"+String(index)) {
             content.style.display = "block";  // 显示对应的 content 页面
-            document.getElementById("name").textContent = NameList[index];
+            document.getElementById("name").textContent = nameList[index];
         } else {
             content.style.display = "none";   // 隐藏其他页面
         }
@@ -40,6 +40,7 @@ function changePage(index) {
 
     // 遍历所有的 character-box，移除 'character-box-selected' 样式
     characterBoxes.forEach(function(box) {
+        box.style.pointerEvents = 'auto';
         box.classList.remove("character-box-selected");
     });
 
@@ -205,8 +206,8 @@ function saveName(index) {
     var writeIcon = characterBox.querySelector(".write-icon");
     var saveIcon = characterBox.querySelector(".save-icon");
 
-    // 更新 NameList 数组
-    NameList[index] = inputBox.value;
+    // 更新 nameList 数组
+    nameList[index] = inputBox.value;
 
     // 禁用输入框，显示写入按钮，隐藏保存按钮
     inputBox.disabled = true;
@@ -214,12 +215,13 @@ function saveName(index) {
     saveIcon.style.display = "none";
 
     // 更新 UI 上的显示名称
-    characterBox.querySelector(".name-input").value = NameList[index];
+    characterBox.querySelector(".name-input").value = nameList[index];
 }
 
-function addCharacter(name) {
+function addCharacter(name, tone) {
     // 向 NameList 添加一个新的角色
-    NameList.push(name);
+    nameList.push(name);
+    toneList.push(tone);
     
     // 向 CharacterList 添加一个新的角色
     var newIndex = CharacterList.length;
@@ -275,8 +277,8 @@ function addCharacter(name) {
 
 function deleteCharacter(index) {
     // 从 NameList 和 CharacterList 中删除对应项
-    //NameList.splice(index, 1);
-    //CharacterList.splice(index, 1);
+    NameList[index] = "";
+     //CharacterList.splice(index, 1);
 
     // 删除对应的 character-box
     var characterBox = document.getElementById("character" + index);

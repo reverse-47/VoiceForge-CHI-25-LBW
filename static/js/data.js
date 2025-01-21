@@ -4,7 +4,8 @@ currentPage = 0;
 //conversationLength = [0, 0];
 conversationList = [];
 
-let NameList = []
+let nameList = [];
+let toneList = [];
 let CharacterList = [];
 
 function send(inputText, tone) {

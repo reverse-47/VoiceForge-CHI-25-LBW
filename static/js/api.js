@@ -48,3 +48,20 @@ function getMix(timbreList) {
         });
     });
 }
+
+function getNarrativeAudio(inputText, toneList) {
+    return new Promise(function (resolve, reject) {
+        $.ajax({
+            url: '/getNarrativeAudio',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({inputText:inputText, toneList: toneList}),
+            success: function (data) {
+                resolve(data);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                reject(errorThrown);
+            }
+        });
+    });
+}
